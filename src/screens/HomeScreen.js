@@ -21,32 +21,26 @@ const HomeScreen = () => {
 
     const callbacks = {
       onConnectionRequest: (requestingCode) => {
-        console.log('Connection request received:', requestingCode);
         setShowConnectionRequest(true);
         setPendingConnectionCode(requestingCode);
       },
       onConnectionAccepted: () => {
-        console.log('Connection accepted');
         setIsConnected(true);
         setConnectedToCode(pendingConnectionCode);
       },
-      onConnectionStateChange: (state) => {
-        console.log('Connection state changed:', state);
-        if (state === 'connected') {
-          setIsConnected(true);
-          setError(null);
-        } else if (state === 'disconnected' || state === 'failed' || state === 'closed') {
-          handleDisconnect();
+      onRemoteStream: (stream) => {
+        console.log('Received remote stream in HomeScreen:', stream);
+        if (stream && stream.toURL) {
+          setRemoteStream(stream);
+          setIsSharing(true);
+        } else {
+          console.error('Invalid stream received:', stream);
         }
       },
-      onRemoteStream: (stream) => {
-        console.log('Remote stream received');
-        setRemoteStream(stream);
-      },
-      onScreenShareStarted: () => {
-        console.log('Screen sharing started');
-        setIsSharing(true);
-      },
+      // onScreenShareStarted: () => {
+      //   console.log('Screen sharing started');
+      //   setIsSharing(true);
+      // },
       onDisconnected: () => {
         handleDisconnect();
       },
@@ -113,10 +107,13 @@ const HomeScreen = () => {
         )}
 
         {isConnected && remoteStream && !isSharing && (
-          <RemoteDisplay 
-            stream={remoteStream} 
-            onDisconnect={handleDisconnect} 
-          />
+          <View style={styles.displayContainer}>
+            <RemoteDisplay 
+              stream={remoteStream} 
+              onDisconnect={handleDisconnect}
+              isConnected={isConnected} 
+            />
+          </View>
         )}
 
         {(isConnected || isSharing) && (
@@ -213,6 +210,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     fontSize: 14,
+  },
+  displayContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    margin: 10,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
 });
 

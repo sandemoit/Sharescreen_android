@@ -4,10 +4,11 @@ import { connectToPeer } from '../utils/webrtc';
 
 const ConnectForm = ({ myCode }) => {
   const [connectCode, setConnectCode] = useState('');
+  // const [targetCode, setTargetCode] = useState('');
 
   const handleConnect = () => {
-    if (connectCode === myCode) return;
-    connectToPeer(connectCode);
+      if (connectCode === myCode) return;
+      connectToPeer(connectCode);
   };
 
   return (

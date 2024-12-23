@@ -23,6 +23,7 @@ export const initializeWebRTC = async (myCode, callbacks) => {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
         {
           urls: 'turn:numb.viagenie.ca',
           username: 'webrtc@live.com',
@@ -116,8 +117,10 @@ const setupPeerConnectionListeners = (callbacks) => {
   };
 
   peerConnection.ontrack = (event) => {
-    console.log('Received remote track');
+    console.log('Track received:', event.track.kind);
+    console.log('Streams count:', event.streams.length);
     if (event.streams && event.streams[0]) {
+      console.log('Stream tracks:', event.streams[0].getTracks().length);
       remoteStream = event.streams[0];
       callbacks.onRemoteStream?.(remoteStream);
     }
@@ -170,9 +173,10 @@ export const startScreenShare = async () => {
     localStream = await mediaDevices.getDisplayMedia({
       video: {
         mandatory: {
-          minWidth: 1280,
-          minHeight: 720,
-          minFrameRate: 30,
+          chromeMediaSource: 'screen',
+          maxWidth: 1920,
+          maxHeight: 1080,
+          maxFrameRate: 30
         }
       }
     });
